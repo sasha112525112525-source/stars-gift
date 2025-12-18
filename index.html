@@ -1,116 +1,332 @@
-html
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌟 StarCase Game</title>
+<title>🌟 StarCase Premium</title>
 <style>
-* {margin:0;padding:0;box-sizing:border-box;font-family:Arial;user-select:none;}
-body {background:#0f0c29;color:white;min-height:100vh;padding:10px;}
-.loading {position:fixed;top:0;left:0;width:100%;height:100%;background:#0f0c29;z-index:1000;display:flex;flex-direction:column;justify-content:center;align-items:center;}
-.loader {width:60px;height:60px;border:5px solid #333;border-top:5px solid #ffcc00;border-radius:50%;animation:spin 1s linear infinite;}
-.tabs {display:flex;background:#1a1a2e;border-radius:10px;margin:10px 0;overflow:hidden;}
-.tab {flex:1;padding:15px;text-align:center;cursor:pointer;transition:0.3s;}
-.tab.active {background:#ffcc00;color:#000;font-weight:bold;}
-.header {text-align:center;padding:15px;}
-.balance {font-size:40px;color:#ffcc00;margin:10px 0;}
-.stats {display:flex;justify-content:center;gap:15px;margin:15px 0;flex-wrap:wrap;}
-.stat {background:rgba(255,255,255,0.1);padding:10px 15px;border-radius:10px;}
-.tap-area {width:200px;height:200px;background:linear-gradient(45deg,#ff3366,#ff9933);border-radius:50%;margin:20px auto;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;}
-.tap-area:active {transform:scale(0.95);}
-.case-grid {display:grid;grid-template-columns:repeat(auto-fit, minmax(150px,1fr));gap:15px;margin:20px 0;}
-.case {background:linear-gradient(45deg,#1a1a2e,#16213e);border-radius:15px;padding:20px;text-align:center;cursor:pointer;border:2px solid #333;transition:0.3s;}
-.case:hover {border-color:#ffcc00;transform:translateY(-5px);}
-.case-price {color:#ffcc00;font-size:18px;margin:10px 0;}
-.wheel-container {position:relative;width:250px;height:250px;margin:20px auto;}
-.wheel {width:100%;height:100%;border-radius:50%;background:conic-gradient(red,orange,yellow,green,blue,indigo,violet,red);transition:transform 3s;}
-.wheel-pointer {position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:20px solid #ffcc00;}
-.donate-grid {display:grid;grid-template-columns:repeat(auto-fit, minmax(120px,1fr));gap:10px;margin:20px 0;}
-.donate-option {background:rgba(0,200,100,0.2);border:2px solid #00cc66;border-radius:10px;padding:15px;text-align:center;cursor:pointer;}
-.donate-option:hover {background:rgba(0,200,100,0.3);}
-.modal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:100;align-items:center;justify-content:center;}
-.modal-content {background:#1a1a2e;padding:25px;border-radius:15px;max-width:400px;width:90%;border:2px solid #ffcc00;text-align:center;}
-.btn {background:linear-gradient(45deg,#ff3366,#ff9933);color:white;border:none;padding:12px 25px;border-radius:25px;font-size:16px;cursor:pointer;margin:10px;width:100%;}
+/* Базовые стили */
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;user-select:none;}
+body {background:radial-gradient(circle at top,#0f0c29,#302b63,#24243e);color:#fff;min-height:100vh;overflow-x:hidden;}
+
+/* Загрузка */
+.loading-screen {position:fixed;top:0;left:0;width:100%;height:100%;background:#0f0c29;z-index:1000;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.loader {width:70px;height:70px;border:5px solid rgba(255,204,0,0.2);border-top:5px solid #ffcc00;border-radius:50%;animation:spin 1.5s linear infinite;margin-bottom:20px;}
+.loading-text {font-size:20px;margin-top:20px;letter-spacing:2px;}
+
+/* Основной контейнер */
+.container {max-width:1200px;margin:0 auto;padding:15px;display:none;}
+
+/* Хедер */
+.header {background:linear-gradient(90deg,rgba(30,30,60,0.8),rgba(20,20,50,0.9));border-radius:20px;padding:25px;margin-bottom:25px;border:2px solid rgba(255,204,0,0.3);box-shadow:0 10px 30px rgba(0,0,0,0.5);}
+.balance {font-size:48px;font-weight:bold;color:#ffcc00;text-shadow:0 0 20px rgba(255,204,0,0.5);margin:10px 0;}
+.balance small {font-size:20px;color:#aaa;}
+
+/* Статистика */
+.stats-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin:20px 0;}
+.stat-card {background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;text-align:center;border:1px solid rgba(255,255,255,0.1);transition:transform 0.3s;}
+.stat-card:hover {transform:translateY(-5px);border-color:#ffcc00;}
+.stat-value {font-size:28px;color:#ffcc00;margin:5px 0;}
+.stat-label {font-size:13px;color:#aaa;text-transform:uppercase;letter-spacing:1px;}
+
+/* Вкладки */
+.tabs-container {background:rgba(20,20,40,0.8);border-radius:15px;margin:25px 0;overflow:hidden;}
+.tabs-header {display:flex;background:rgba(10,10,30,0.9);}
+.tab-btn {flex:1;padding:18px;text-align:center;cursor:pointer;transition:all 0.3s;font-size:16px;font-weight:bold;border-bottom:3px solid transparent;}
+.tab-btn.active {background:rgba(255,204,0,0.1);border-bottom-color:#ffcc00;color:#ffcc00;}
+.tab-btn:hover:not(.active) {background:rgba(255,255,255,0.05);}
+.tab-content {padding:25px;display:none;}
+.tab-content.active {display:block;}
+
+/* Тапалка */
+.tap-section {text-align:center;}
+.tap-circle {width:220px;height:220px;background:radial-gradient(circle,#ff3366,#cc0066);border-radius:50%;margin:30px auto;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;box-shadow:0 15px 35px rgba(255,51,102,0.4);transition:transform 0.1s;position:relative;overflow:hidden;}
+.tap-circle:before {content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.1),transparent);transform:translateX(-100%);}
+.tap-circle:hover:before {animation:shine 1.5s;}
+.tap-circle:active {transform:scale(0.95);}
+.tap-icon {font-size:50px;margin-bottom:10px;}
+.tap-count {font-size:28px;font-weight:bold;}
+.tap-info {margin-top:15px;color:#aaa;font-size:14px;}
+
+/* Кейсы */
+.cases-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;}
+.case-card {background:linear-gradient(135deg,rgba(40,40,80,0.9),rgba(30,30,60,0.9));border-radius:20px;padding:25px;cursor:pointer;transition:all 0.4s;border:2px solid transparent;position:relative;overflow:hidden;}
+.case-card:hover {transform:translateY(-10px);border-color:#ffcc00;box-shadow:0 15px 35px rgba(255,204,0,0.3);}
+.case-card:before {content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(45deg,transparent,rgba(255,255,255,0.05),transparent);transform:translateX(-100%);}
+.case-card:hover:before {animation:shine 1.5s;}
+.case-icon {font-size:45px;margin-bottom:15px;text-align:center;}
+.case-name {font-size:18px;font-weight:bold;margin-bottom:10px;text-align:center;}
+.case-price {color:#ffcc00;font-size:22px;font-weight:bold;text-align:center;margin:10px 0;}
+.case-odds {font-size:12px;color:#aaa;text-align:center;margin-top:10px;}
+
+/* Колесо */
+.wheel-section {text-align:center;}
+.wheel-container {position:relative;width:280px;height:280px;margin:30px auto;}
+.wheel {width:100%;height:100%;border-radius:50%;background:conic-gradient(#ff0000 0% 16.6%,#ff9900 16.6% 33.2%,#ffff00 33.2% 49.8%,#00ff00 49.8% 66.4%,#0099ff 66.4% 83%,#9900ff 83% 100%);transition:transform 4s cubic-bezier(0.17,0.67,0.83,0.67);position:relative;}
+.wheel-pointer {position:absolute;top:-25px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:35px solid #ffcc00;z-index:2;}
+.wheel-center {position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;background:#1a1a3a;border-radius:50%;z-index:1;border:4px solid #ffcc00;}
+
+/* Донат */
+.donate-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;}
+.donate-card {background:linear-gradient(135deg,rgba(0,150,100,0.15),rgba(0,100,150,0.15));border-radius:15px;padding:25px;text-align:center;cursor:pointer;border:2px solid rgba(0,200,100,0.3);transition:all 0.3s;}
+.donate-card:hover {transform:scale(1.05);border-color:#00cc66;background:linear-gradient(135deg,rgba(0,150,100,0.25),rgba(0,100,150,0.25));}
+.donate-amount {font-size:28px;color:#00cc66;font-weight:bold;margin:10px 0;}
+.donate-desc {font-size:13px;color:#aaa;margin-top:5px;}
+
+/* Модальные окна */
+.modal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:2000;align-items:center;justify-content:center;animation:fadeIn 0.3s;}
+.modal-content {background:linear-gradient(135deg,#1a1a3a,#0f0c29);border-radius:25px;padding:40px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto;border:3px solid #ffcc00;box-shadow:0 25px 50px rgba(0,0,0,0.7);}
+.modal-title {font-size:28px;color:#ffcc00;margin-bottom:25px;text-align:center;}
+
+/* Анимация открытия кейса */
+.case-animation {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);z-index:3000;align-items:center;justify-content:center;}
+.case-rewards {display:grid;grid-template-columns:repeat(5,1fr);gap:15px;margin:30px 0;}
+.reward-item {background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;text-align:center;border:2px solid transparent;transition:all 0.3s;opacity:0.5;}
+.reward-item.won {border-color:#ffcc00;background:rgba(255,204,0,0.1);opacity:1;transform:scale(1.1);}
+.reward-icon {font-size:40px;margin-bottom:10px;}
+.reward-value {font-size:18px;font-weight:bold;color:#ffcc00;}
+
+/* Кнопки */
+.btn {background:linear-gradient(45deg,#ff3366,#ff9933);color:white;border:none;padding:16px 35px;border-radius:50px;font-size:17px;font-weight:bold;cursor:pointer;transition:all 0.3s;margin:10px;display:inline-flex;align-items:center;justify-content:center;gap:10px;}
+.btn:hover {transform:translateY(-3px);box-shadow:0 10px 25px rgba(255,51,102,0.4);}
+.btn-primary {background:linear-gradient(45deg,#3366ff,#33ccff);}
+.btn-success {background:linear-gradient(45deg,#00cc66,#00ff88);}
+
+/* Прогресс бары */
+.progress-bar {height:10px;background:rgba(255,255,255,0.1);border-radius:5px;margin:15px 0;overflow:hidden;}
+.progress-fill {height:100%;background:linear-gradient(90deg,#ff3366,#ffcc00);border-radius:5px;width:0%;transition:width 0.5s;}
+
+/* Анимации */
 @keyframes spin {0%{transform:rotate(0);}100%{transform:rotate(360deg);}}
+@keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+@keyframes shine {100%{transform:translateX(100%);}}
+@keyframes pulse {0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+@keyframes float {0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+/* Фоновые звёзды */
+.star {position:absolute;background:white;border-radius:50%;animation:float 3s infinite;}
 </style>
 </head>
 <body>
 
-<!-- Загрузка -->
-<div class="loading" id="loading">
+<!-- Загрузочный экран -->
+<div class="loading-screen" id="loading">
     <div class="loader"></div>
-    <div style="margin-top:20px;">Загрузка StarCase...</div>
-    <div id="loadStatus" style="margin-top:10px;font-size:14px;opacity:0.7;"></div>
+    <div class="loading-text">STARCASE PREMIUM</div>
+    <div id="loadStatus" style="margin-top:15px;color:#aaa;font-size:14px;">Инициализация...</div>
 </div>
 
-<!-- Игра -->
-<div id="game" style="display:none;">
+<!-- Основной контейнер -->
+<div class="container" id="gameContainer">
     <!-- Хедер -->
     <div class="header">
-        <h1>🌟 StarCase</h1>
-        <div class="balance" id="balance">10 ⭐</div>
-        <div style="opacity:0.8;">Отправляйте подарки @Mamborik</div>
-    </div>
-
-    <!-- Статистика -->
-    <div class="stats">
-        <div class="stat">Уровень: <span id="level">1</span></div>
-        <div class="stat">Опыт: <span id="xp">0</span>/100</div>
-        <div class="stat">Тапов: <span id="taps">0</span></div>
-        <div class="stat">Кейсов: <span id="cases">0</span></div>
+        <div style="text-align:center;">
+            <h1 style="font-size:32px;margin-bottom:10px;">🌟 StarCase Premium</h1>
+            <div class="balance" id="balance">10 <small>звёзд</small></div>
+            <div style="color:#aaa;margin-top:10px;">Отправляйте подарки @Mamborik для пополнения</div>
+        </div>
+        
+        <!-- Статистика -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Уровень</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Опыт</div>
+                <div class="stat-value"><span id="xp">0</span>/100</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Всего тапов</div>
+                <div class="stat-value" id="totalTaps">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Кейсов открыто</div>
+                <div class="stat-value" id="casesOpened">0</div>
+            </div>
+        </div>
     </div>
 
     <!-- Вкладки -->
-    <div class="tabs">
-        <div class="tab active" onclick="switchTab('tap')">👆 ТАПАЛКА</div>
-        <div class="tab" onclick="switchTab('cases')">🎁 КЕЙСЫ</div>
-        <div class="tab" onclick="switchTab('wheel')">🎯 КОЛЕСО</div>
-        <div class="tab" onclick="switchTab('donate')">💎 ДОНАТ</div>
-    </div>
-
-    <!-- Тапалка -->
-    <div id="tapTab" class="tab-content">
-        <div class="tap-area" onclick="tap()">
-            👆<br>ТАПНИ<br><span id="tapCounter">0</span>
+    <div class="tabs-container">
+        <div class="tabs-header">
+            <div class="tab-btn active" onclick="switchTab('tap')">👆 ТАПАЛКА</div>
+            <div class="tab-btn" onclick="switchTab('cases')">🎁 КЕЙСЫ</div>
+            <div class="tab-btn" onclick="switchTab('wheel')">🎯 КОЛЕСО</div>
+            <div class="tab-btn" onclick="switchTab('donate')">💎 ДОНАТ</div>
         </div>
-        <div style="text-align:center;margin:15px;">
-            <div>1 тап = 0.00028 ⭐ (10 ⭐ за 10 часов)</div>
-            <div style="opacity:0.7;font-size:14px;margin-top:5px;">Задержка 0.5 сек между тапами</div>
+        
+        <!-- Вкладка тапалки -->
+        <div class="tab-content active" id="tapTab">
+            <div class="tap-section">
+                <h2 style="margin-bottom:20px;color:#ffcc00;">ТАПАЛКА</h2>
+                <p style="color:#aaa;margin-bottom:20px;">Тапайте по кругу чтобы зарабатывать звёзды</p>
+                
+                <div class="tap-circle" onclick="tap()" id="tapCircle">
+                    <div class="tap-icon">👆</div>
+                    <div class="tap-count" id="tapCount">0</div>
+                    <div style="font-size:14px;color:#aaa;">тапов</div>
+                </div>
+                
+                <div style="margin-top:30px;">
+                    <div style="display:flex;justify-content:center;gap:30px;margin-bottom:20px;">
+                        <div>
+                            <div style="color:#aaa;">Звёзд за тап</div>
+                            <div style="color:#ffcc00;font-size:20px;font-weight:bold;">0.00028⭐</div>
+                        </div>
+                        <div>
+                            <div style="color:#aaa;">Задержка</div>
+                            <div style="color:#ffcc00;font-size:20px;font-weight:bold;">0.5 сек</div>
+                        </div>
+                        <div>
+                            <div style="color:#aaa;">За 10 часов</div>
+                            <div style="color:#ffcc00;font-size:20px;font-weight:bold;">~10⭐</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="xpProgress" style="width:0%"></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:14px;color:#aaa;">
+                        <div>Прогресс до уровня</div>
+                        <div><span id="xpCurrent">0</span>/100 XP</div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <!-- Кейсы -->
-    <div id="casesTab" class="tab-content" style="display:none;">
-        <div class="case-grid" id="casesContainer">
-            <!-- Кейсы генерируются через JS -->
+        
+        <!-- Вкладка кейсов -->
+        <div class="tab-content" id="casesTab">
+            <h2 style="margin-bottom:25px;color:#ffcc00;">КОЛЛЕКЦИЯ КЕЙСОВ</h2>
+            <p style="color:#aaa;margin-bottom:25px;text-align:center;">Открывайте кейсы с уникальными наградами и шансами</p>
+            
+            <div class="cases-grid" id="casesGrid">
+                <!-- Кейсы генерируются через JS -->
+            </div>
+            
+            <div style="margin-top:40px;background:rgba(255,204,0,0.1);border-radius:15px;padding:20px;">
+                <h3 style="color:#ffcc00;margin-bottom:15px;">📊 ШАНСЫ НА ВЫИГРЫШ</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                            <span style="color:#aaa;">Неокупаемый выигрыш</span>
+                            <span style="color:#ff6666;font-weight:bold;">70%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:70%;background:#ff6666;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                            <span style="color:#aaa;">Средний выигрыш</span>
+                            <span style="color:#ffcc00;font-weight:bold;">25%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:25%;background:#ffcc00;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                            <span style="color:#aaa;">Джекпот</span>
+                            <span style="color:#00ff88;font-weight:bold;">1%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:1%;background:#00ff88;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <!-- Колесо -->
-    <div id="wheelTab" class="tab-content" style="display:none;">
-        <div class="wheel-container">
-            <div class="wheel-pointer"></div>
-            <div class="wheel" id="wheel"></div>
+        
+        <!-- Вкладка колеса -->
+        <div class="tab-content" id="wheelTab">
+            <div class="wheel-section">
+                <h2 style="margin-bottom:20px;color:#ffcc00;">КОЛЕСО ФОРТУНЫ</h2>
+                <p style="color:#aaa;margin-bottom:20px;">Крутите колесо и выигрывайте призы!</p>
+                
+                <div class="wheel-container">
+                    <div class="wheel-pointer"></div>
+                    <div class="wheel" id="wheel"></div>
+                    <div class="wheel-center"></div>
+                </div>
+                
+                <div style="margin:30px 0;">
+                    <button class="btn btn-primary" onclick="spinWheel()" id="spinBtn">
+                        <span style="font-size:24px;">🎯</span>
+                        КРУТИТЬ (50⭐)
+                    </button>
+                    <div style="color:#aaa;margin-top:15px;">
+                        Бесплатный спин через: <span id="spinTimer" style="color:#ffcc00;">24:00:00</span>
+                    </div>
+                </div>
+                
+                <div style="background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;">
+                    <h3 style="color:#ffcc00;margin-bottom:15px;">🎁 ВОЗМОЖНЫЕ ПРИЗЫ</h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+                        <div style="text-align:center;">
+                            <div style="font-size:24px;">🔴</div>
+                            <div style="color:#ff6666;">10⭐</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:24px;">🟠</div>
+                            <div style="color:#ff9933;">25⭐</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:24px;">🟡</div>
+                            <div style="color:#ffcc00;">50⭐</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:24px;">🟢</div>
+                            <div style="color:#00cc66;">100⭐</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:24px;">🔵</div>
+                            <div style="color:#0099ff;">200⭐</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <div style="font-size:24px;">🟣</div>
+                            <div style="color:#9900ff;">500⭐</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div style="text-align:center;margin:20px;">
-            <button class="btn" onclick="spinWheel()" id="spinBtn">КРУТИТЬ (50 ⭐)</button>
-            <div style="margin-top:10px;font-size:14px;opacity:0.7;">Бесплатный спин через: <span id="spinTimer">24:00:00</span></div>
-        </div>
-    </div>
-
-    <!-- Донат -->
-    <div id="donateTab" class="tab-content" style="display:none;">
-        <h3 style="text-align:center;margin:15px;">Отправьте подарок @Mamborik</h3>
-        <div class="donate-grid" id="donateGrid">
-            <!-- Донат-опции генерируются через JS -->
-        </div>
-        <div style="text-align:center;margin:20px;padding:15px;background:rgba(255,204,0,0.1);border-radius:10px;">
-            <p>📱 Как получить звёзды:</p>
-            <p>1. Отправьте подарок в Telegram @Mamborik</p>
-            <p>2. Напишите мне ваш @username</p>
-            <p>3. Я вручную добавлю звёзды в игру</p>
-            <p style="opacity:0.7;font-size:14px;margin-top:10px;">Обычно в течение 1-24 часов</p>
+        
+        <!-- Вкладка доната -->
+        <div class="tab-content" id="donateTab">
+            <h2 style="margin-bottom:25px;color:#ffcc00;">ПОПОЛНЕНИЕ БАЛАНСА</h2>
+            <p style="color:#aaa;margin-bottom:25px;text-align:center;">Отправьте подарок в Telegram для получения звёзд</p>
+            
+            <div class="donate-grid" id="donateGrid">
+                <!-- Донат-опции генерируются через JS -->
+            </div>
+            
+            <div style="margin-top:40px;background:linear-gradient(135deg,rgba(0,150,100,0.2),rgba(0,100,150,0.2));border-radius:20px;padding:30px;border:2px solid rgba(0,200,100,0.3);">
+                <h3 style="color:#00cc66;margin-bottom:20px;">📱 КАК ПОЛУЧИТЬ ЗВЁЗДЫ</h3>
+                <div style="display:grid;gap:15px;">
+                    <div style="display:flex;align-items:center;gap:15px;">
+                        <div style="background:rgba(0,200,100,0.2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;">1</div>
+                        <div>
+                            <div style="font-weight:bold;">Отправьте подарок</div>
+                            <div style="color:#aaa;font-size:14px;">В Telegram пользователю <span style="color:#00cc66;font-weight:bold;">@Mamborik</span></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:15px;">
+                        <div style="background:rgba(0,200,100,0.2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;">2</div>
+                        <div>
+                            <div style="font-weight:bold;">Напишите ваш @username</div>
+                            <div style="color:#aaa;font-size:14px;">Сообщите мне ваш ник в Telegram</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:15px;">
+                        <div style="background:rgba(0,200,100,0.2);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;">3</div>
+                        <div>
+                            <div style="font-weight:bold;">Получите звёзды</div>
+                            <div style="color:#aaa;font-size:14px;">Я вручную добавлю звёзды в ваш аккаунт</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -118,47 +334,156 @@ body {background:#0f0c29;color:white;min-height:100vh;padding:10px;}
 <!-- Модалка кейса -->
 <div class="modal" id="caseModal">
     <div class="modal-content">
-        <h2 id="caseName">Кейс</h2>
-        <div id="caseReward" style="font-size:60px;margin:20px;">🎁</div>
-        <div id="caseResult" style="font-size:24px;margin:15px;"></div>
-        <button class="btn" onclick="closeModal('caseModal')">ОК</button>
+        <div class="modal-title" id="caseModalTitle">ОТКРЫТИЕ КЕЙСА</div>
+        <div style="text-align:center;margin:30px 0;">
+            <div style="font-size:80px;" id="caseModalIcon">🎁</div>
+            <div style="font-size:24px;margin:20px 0;color:#ffcc00;" id="caseModalReward"></div>
+            <div style="color:#aaa;margin-bottom:25px;" id="caseModalDesc"></div>
+            <button class="btn btn-success" onclick="closeModal('caseModal')">ПОНЯТНО</button>
+        </div>
     </div>
 </div>
 
-<!-- Модалка колеса -->
-<div class="modal" id="wheelModal">
+<!-- Анимация открытия кейса -->
+<div class="case-animation" id="caseAnimation">
     <div class="modal-content">
-        <h2>🎯 Результат</h2>
-        <div id="wheelReward" style="font-size:60px;margin:20px;">⭐</div>
-        <div id="wheelResult" style="font-size:24px;margin:15px;"></div>
-        <button class="btn" onclick="closeModal('wheelModal')">ОК</button>
+        <div class="modal-title">ВЫБИРАЕТСЯ ПРИЗ...</div>
+        
+        <div class="case-rewards" id="caseRewards">
+            <!-- Награды генерируются через JS -->
+        </div>
+        
+        <div style="text-align:center;margin-top:30px;">
+            <div id="caseAnimationResult" style="font-size:24px;color:#ffcc00;margin-bottom:20px;"></div>
+            <button class="btn btn-success" onclick="finishCaseAnimation()">ЗАБРАТЬ ПРИЗ</button>
+        </div>
     </div>
 </div>
 
 <!-- Модалка доната -->
 <div class="modal" id="donateModal">
     <div class="modal-content">
-        <h2>💎 Донат</h2>
-        <div style="font-size:60px;margin:20px;">🎁</div>
-        <div id="donateInfo" style="margin:15px;"></div>
-        <input type="text" id="donateUsername" placeholder="Ваш @username в Telegram" style="width:100%;padding:12px;margin:15px 0;background:#2a2a4a;border:1px solid #444;color:white;border-radius:8px;">
-        <button class="btn" onclick="confirmDonate()">📝 Запомнить username</button>
-        <button class="btn" onclick="closeModal('donateModal')" style="background:#666;">Отмена</button>
+        <div class="modal-title">ПОДТВЕРЖДЕНИЕ ДОНАТА</div>
+        <div style="text-align:center;margin:30px 0;">
+            <div style="font-size:80px;color:#00cc66;">🎁</div>
+            <div style="font-size:24px;margin:20px 0;color:#00cc66;" id="donateModalAmount"></div>
+            <div style="color:#aaa;margin-bottom:25px;">
+                Отправьте подарок на <span id="donateStarsAmount" style="color:#00cc66;font-weight:bold;">0</span> звёзд<br>
+                пользователю <span style="color:#00cc66;font-weight:bold;">@Mamborik</span>
+            </div>
+            
+            <input type="text" id="donateUsername" placeholder="Ваш @username в Telegram" 
+                   style="width:100%;padding:15px;background:rgba(255,255,255,0.1);border:2px solid #00cc66;border-radius:10px;color:white;font-size:16px;margin-bottom:20px;">
+            
+            <button class="btn btn-success" onclick="confirmDonate()">✅ Я ОТПРАВИЛ ПОДАРОК</button>
+            <button class="btn" onclick="closeModal('donateModal')" style="background:#666;margin-top:15px;">ОТМЕНА</button>
+        </div>
     </div>
 </div>
 
 <script>
-// ========== НАСТРОЙКИ ==========
-const DONATE_OPTIONS = [15, 50, 100, 250, 500, 1000];
+// ========== КОНСТАНТЫ И НАСТРОЙКИ ==========
 const CASES = [
-    {id:1,name:"Базовый",price:10,items:[1,2,3,4,5,10,15,20,25,30]},
-    {id:2,name:"Серебряный",price:50,items:[10,20,30,40,50,75,100,125,150,200]},
-    {id:3,name:"Золотой",price:100,items:[50,75,100,125,150,200,250,300,350,500]},
-    {id:4,name:"Платиновый",price:250,items:[100,200,300,400,500,750,1000,1250,1500,2000]},
-    {id:5,name:"Легендарный",price:500,items:[500,750,1000,1500,2000,2500,3000,4000,5000,10000]}
+    {
+        id: 1,
+        name: "📦 Базовый",
+        price: 10,
+        icon: "📦",
+        rewards: [
+            {type: "stars", value: 1, chance: 25, icon: "⭐"},
+            {type: "stars", value: 2, chance: 20, icon: "⭐"},
+            {type: "stars", value: 3, chance: 15, icon: "⭐"},
+            {type: "stars", value: 5, chance: 10, icon: "⭐⭐"},
+            {type: "stars", value: 10, chance: 8, icon: "⭐⭐⭐"},
+            {type: "gift", value: 15, chance: 7, icon: "🎁"},
+            {type: "stars", value: 20, chance: 5, icon: "🌟🌟"},
+            {type: "gift", value: 30, chance: 4, icon: "🎁🎁"},
+            {type: "stars", value: 50, chance: 3, icon: "🌟🌟🌟"},
+            {type: "jackpot", value: 100, chance: 1, icon: "💰"}
+        ],
+        color: "#6666ff"
+    },
+    {
+        id: 2,
+        name: "🥈 Серебряный",
+        price: 50,
+        icon: "🥈",
+        rewards: [
+            {type: "stars", value: 10, chance: 25, icon: "⭐"},
+            {type: "stars", value: 20, chance: 20, icon: "⭐⭐"},
+            {type: "stars", value: 30, chance: 15, icon: "⭐⭐⭐"},
+            {type: "gift", value: 40, chance: 10, icon: "🎁"},
+            {type: "stars", value: 50, chance: 8, icon: "🌟🌟"},
+            {type: "gift", value: 75, chance: 7, icon: "🎁🎁"},
+            {type: "stars", value: 100, chance: 5, icon: "🌟🌟🌟"},
+            {type: "gift", value: 150, chance: 4, icon: "🎁🎁🎁"},
+            {type: "stars", value: 200, chance: 3, icon: "💎"},
+            {type: "jackpot", value: 500, chance: 1, icon: "💰💰"}
+        ],
+        color: "#cccccc"
+    },
+    {
+        id: 3,
+        name: "🥇 Золотой",
+        price: 100,
+        icon: "🥇",
+        rewards: [
+            {type: "stars", value: 25, chance: 25, icon: "⭐"},
+            {type: "stars", value: 50, chance: 20, icon: "⭐⭐"},
+            {type: "stars", value: 75, chance: 15, icon: "⭐⭐⭐"},
+            {type: "gift", value: 100, chance: 10, icon: "🎁"},
+            {type: "stars", value: 150, chance: 8, icon: "🌟🌟"},
+            {type: "gift", value: 200, chance: 7, icon: "🎁🎁"},
+            {type: "stars", value: 300, chance: 5, icon: "🌟🌟🌟"},
+            {type: "gift", value: 400, chance: 4, icon: "🎁🎁🎁"},
+            {type: "stars", value: 500, chance: 3, icon: "💎"},
+            {type: "jackpot", value: 1000, chance: 1, icon: "💰💰💰"}
+        ],
+        color: "#ffcc00"
+    },
+    {
+        id: 4,
+        name: "💎 Платиновый",
+        price: 250,
+        icon: "💎",
+        rewards: [
+            {type: "stars", value: 50, chance: 25, icon: "⭐"},
+            {type: "stars", value: 100, chance: 20, icon: "⭐⭐"},
+            {type: "stars", value: 150, chance: 15, icon: "⭐⭐⭐"},
+            {type: "gift", value: 200, chance: 10, icon: "🎁"},
+            {type: "stars", value: 300, chance: 8, icon: "🌟🌟"},
+            {type: "gift", value: 400, chance: 7, icon: "🎁🎁"},
+            {type: "stars", value: 500, chance: 5, icon: "🌟🌟🌟"},
+            {type: "gift", value: 750, chance: 4, icon: "🎁🎁🎁"},
+            {type: "stars", value: 1000, chance: 3, icon: "💎💎"},
+            {type: "jackpot", value: 2500, chance: 1, icon: "💰💰💰💰"}
+        ],
+        color: "#33ccff"
+    },
+    {
+        id: 5,
+        name: "👑 Легендарный",
+        price: 500,
+        icon: "👑",
+        rewards: [
+            {type: "stars", value: 100, chance: 25, icon: "⭐"},
+            {type: "stars", value: 200, chance: 20, icon: "⭐⭐"},
+            {type: "stars", value: 300, chance: 15, icon: "⭐⭐⭐"},
+            {type: "gift", value: 400, chance: 10, icon: "🎁"},
+            {type: "stars", value: 500, chance: 8, icon: "🌟🌟"},
+            {type: "gift", value: 750, chance: 7, icon: "🎁🎁"},
+            {type: "stars", value: 1000, chance: 5, icon: "🌟🌟🌟"},
+            {type: "gift", value: 1500, chance: 4, icon: "🎁🎁🎁"},
+            {type: "stars", value: 2000, chance: 3, icon: "💎💎"},
+            {type: "jackpot", value: 5000, chance: 1, icon: "💰💰💰💰💰"}
+        ],
+        color: "#ff66ff"
+    }
 ];
 
-// ========== СОСТОЯНИЕ ==========
+const DONATE_OPTIONS = [15, 50, 100, 250, 500, 1000];
+
+// ========== СОСТОЯНИЕ ИГРЫ ==========
 let game = {
     stars: 10,
     level: 1,
@@ -167,281 +492,4 @@ let game = {
     casesOpened: 0,
     lastTap: 0,
     username: "",
-    spinCooldown: 0
-};
-
-// ========== ЗАГРУЗКА ==========
-window.onload = function() {
-    simulateLoading();
-};
-
-function simulateLoading() {
-    const steps = ["Загрузка данных...","Инициализация игр...","Создание кейсов...","Готово!"];
-    let step = 0;
-    
-    const interval = setInterval(() => {
-        document.getElementById("loadStatus").textContent = steps[step];
-        step++;
-        
-        if (step >= steps.length) {
-            clearInterval(interval);
-            setTimeout(() => {
-                loadGame();
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("game").style.display = "block";
-                initGame();
-            }, 500);
-        }
-    }, 500);
-}
-
-function loadGame() {
-    const saved = localStorage.getItem("starcase_save");
-    if (saved) {
-        Object.assign(game, JSON.parse(saved));
-    }
-}
-
-function saveGame() {
-    localStorage.setItem("starcase_save", JSON.stringify(game));
-}
-
-// ========== ИНИЦИАЛИЗАЦИЯ ==========
-function initGame() {
-    updateUI();
-    generateCases();
-    generateDonateOptions();
-    startTimers();
-}
-
-function updateUI() {
-    document.getElementById("balance").textContent = Math.floor(game.stars) + " ⭐";
-    document.getElementById("level").textContent = game.level;
-    document.getElementById("xp").textContent = Math.floor(game.xp);
-    document.getElementById("taps").textContent = game.totalTaps;
-    document.getElementById("cases").textContent = game.casesOpened;
-    document.getElementById("tapCounter").textContent = game.totalTaps;
-}
-
-// ========== ТАПАЛКА ==========
-function tap() {
-    const now = Date.now();
-    if (now - game.lastTap < 500) return;
-    
-    game.lastTap = now;
-    game.totalTaps++;
-    
-    // 10 звёзд за 10 часов непрерывного тапа = 0.00028 звезды/сек
-    const starsPerTap = 0.00028;
-    game.stars += starsPerTap;
-    
-    // Опыт
-    game.xp += 0.05;
-    if (game.xp >= 100) {
-        game.xp = 0;
-        game.level++;
-    }
-    
-    updateUI();
-    saveGame();
-}
-
-// ========== КЕЙСЫ ==========
-function generateCases() {
-    const container = document.getElementById("casesContainer");
-    container.innerHTML = "";
-    
-    CASES.forEach(caseData => {
-        const caseEl = document.createElement("div");
-        caseEl.className = "case";
-        caseEl.innerHTML = `
-            <div style="font-size:30px;">🎁</div>
-            <div style="font-weight:bold;margin:5px 0;">${caseData.name}</div>
-            <div class="case-price">${caseData.price} ⭐</div>
-            <div style="font-size:12px;opacity:0.7;">10 предметов</div>
-        `;
-        caseEl.onclick = () => openCase(caseData);
-        container.appendChild(caseEl);
-    });
-}
-
-function openCase(caseData) {
-    if (game.stars < caseData.price) {
-        alert("Недостаточно звёзд!");
-        return;
-    }
-    
-    game.stars -= caseData.price;
-    game.casesOpened++;
-    
-    // Случайный предмет из кейса
-    const randomIndex = Math.floor(Math.random() * caseData.items.length);
-    const reward = caseData.items[randomIndex];
-    
-    // Добавляем награду
-    game.stars += reward;
-    
-    // Показываем результат
-    document.getElementById("caseName").textContent = caseData.name + " Кейс";
-    document.getElementById("caseResult").innerHTML = `
-        Вы получили: <span style="color:#ffcc00;font-weight:bold;">${reward} ⭐</span><br>
-        <span style="font-size:16px;opacity:0.8;">Цена: ${caseData.price} ⭐ | Прибыль: ${reward - caseData.price} ⭐</span>
-    `;
-    
-    updateUI();
-    saveGame();
-    showModal("caseModal");
-}
-
-// ========== КОЛЕСО ==========
-function spinWheel() {
-    if (game.stars < 50 && game.spinCooldown > Date.now()) {
-        alert("Нужно 50 ⭐ или дождитесь бесплатного спина!");
-        return;
-    }
-    
-    if (game.spinCooldown <= Date.now()) {
-        // Бесплатный спин
-        game.spinCooldown = Date.now() + 24 * 60 * 60 * 1000;
-    } else {
-        game.stars -= 50;
-    }
-    
-    const wheel = document.getElementById("wheel");
-    const spinBtn = document.getElementById("spinBtn");
-    spinBtn.disabled = true;
-    
-    // Вращение
-    const spins = 3 + Math.random() * 2;
-    const degrees = spins * 360 + Math.floor(Math.random() * 360);
-    wheel.style.transform = `rotate(${degrees}deg)`;
-    
-    // Награда
-    setTimeout(() => {
-        const segment = degrees % 360;
-        let reward = 0;
-        
-        if (segment < 51) reward = 10;      // Красный
-        else if (segment < 103) reward = 25; // Оранжевый
-        else if (segment < 154) reward = 50; // Жёлтый
-        else if (segment < 206) reward = 100; // Зелёный
-        else if (segment < 257) reward = 200; // Синий
-        else reward = 500;                   // Фиолетовый
-        
-        game.stars += reward;
-        
-        // Показываем результат
-        document.getElementById("wheelResult").innerHTML = `
-            Вы выиграли: <span style="color:#ffcc00;font-weight:bold;">${reward} ⭐</span>
-        `;
-        
-        updateUI();
-        saveGame();
-        spinBtn.disabled = false;
-        showModal("wheelModal");
-    }, 3000);
-}
-
-// ========== ДОНАТ ==========
-function generateDonateOptions() {
-    const container = document.getElementById("donateGrid");
-    container.innerHTML = "";
-    
-    DONATE_OPTIONS.forEach(amount => {
-        const option = document.createElement("div");
-        option.className = "donate-option";
-        option.innerHTML = `
-            <div style="font-size:24px;">🎁</div>
-            <div style="font-weight:bold;margin:5px 0;">${amount} ⭐</div>
-            <div style="font-size:12px;opacity:0.7;">Подарок в Telegram</div>
-        `;
-        option.onclick = () => showDonateModal(amount);
-        container.appendChild(option);
-    });
-}
-
-function showDonateModal(amount) {
-    document.getElementById("donateInfo").innerHTML = `
-        Отправьте подарок на <span style="color:#ffcc00;">${amount} ⭐</span><br>
-        пользователю <span style="color:#00cc66;font-weight:bold;">@Mamborik</span><br><br>
-        После отправки напишите мне ваш @username<br>
-        и я добавлю звёзды вручную
-    `;
-    
-    if (game.username) {
-        document.getElementById("donateUsername").value = game.username;
-    }
-    
-    showModal("donateModal");
-}
-
-function confirmDonate() {
-    const username = document.getElementById("donateUsername").value.trim();
-    if (username) {
-        game.username = username;
-        saveGame();
-        alert(`✅ Ваш username сохранён: ${username}\n\nПосле отправки подарка @Mamborik\nнапишите мне и я добавлю звёзды!`);
-        closeModal("donateModal");
-    }
-}
-
-// ========== ВКЛАДКИ ==========
-function switchTab(tabName) {
-    // Скрываем все вкладки
-    document.querySelectorAll(".tab-content").forEach(tab => {
-        tab.style.display = "none";
-    });
-    
-    // Убираем активный класс
-    document.querySelectorAll(".tab").forEach(tab => {
-        tab.classList.remove("active");
-    });
-    
-    // Показываем нужную вкладку
-    document.getElementById(tabName + "Tab").style.display = "block";
-    
-    // Активный таб
-    event.target.classList.add("active");
-}
-
-// ========== ТАЙМЕРЫ ==========
-function startTimers() {
-    // Авто-сохранение
-    setInterval(saveGame, 30000);
-    
-    // Пассивный доход (1 звезда в час)
-    setInterval(() => {
-        game.stars += 1/3600;
-        updateUI();
-    }, 1000);
-    
-    // Таймер колеса
-    setInterval(() => {
-        if (game.spinCooldown > Date.now()) {
-            const remaining = game.spinCooldown - Date.now();
-            const hours = Math.floor(remaining / (60 * 60 * 1000));
-            const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-            const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
-            document.getElementById("spinTimer").textContent = 
-                `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-        } else {
-            document.getElementById("spinTimer").textContent = "Готово!";
-            document.getElementById("spinBtn").textContent = "БЕСПЛАТНЫЙ СПИН";
-        }
-    }, 1000);
-}
-
-// ========== МОДАЛКИ ==========
-function showModal(id) {
-    document.getElementById(id).style.display = "flex";
-}
-
-function closeModal(id) {
-    document.getElementById(id).style.display = "none";
-}
-
-// ========== АВТОСОХРАНЕНИЕ ==========
-window.addEventListener("beforeunload", saveGame);
-</script>
-</body>
-</html>
+    spinCooldown:
