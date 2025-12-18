@@ -1,208 +1,447 @@
+html
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎁 Бонус Звёзды</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        body {
-            background: #000000;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow: hidden;
-            transition: filter 1.5s ease;
-        }
-        
-        .container {
-            max-width: 400px;
-            width: 100%;
-        }
-        
-        h1 {
-            font-size: 28px;
-            margin-bottom: 15px;
-            color: #ffcc00;
-        }
-        
-        p {
-            font-size: 16px;
-            margin-bottom: 30px;
-            opacity: 0.8;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 30px 0;
-        }
-        
-        .progress {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff88, #00ccff);
-            width: 0%;
-            border-radius: 10px;
-            transition: width 0.5s;
-        }
-        
-        .dark-mode {
-            filter: brightness(15%);
-        }
-        
-        .error-screen {
-            display: none;
-        }
-        
-        .error-screen.active {
-            display: block;
-        }
-        
-        button {
-            background: #ff3333;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 25px;
-            margin-top: 20px;
-            cursor: pointer;
-            width: 100%;
-            max-width: 300px;
-        }
-        
-        .emoji {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌟 StarCase Game</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:Arial;user-select:none;}
+body {background:#0f0c29;color:white;min-height:100vh;padding:10px;}
+.loading {position:fixed;top:0;left:0;width:100%;height:100%;background:#0f0c29;z-index:1000;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.loader {width:60px;height:60px;border:5px solid #333;border-top:5px solid #ffcc00;border-radius:50%;animation:spin 1s linear infinite;}
+.tabs {display:flex;background:#1a1a2e;border-radius:10px;margin:10px 0;overflow:hidden;}
+.tab {flex:1;padding:15px;text-align:center;cursor:pointer;transition:0.3s;}
+.tab.active {background:#ffcc00;color:#000;font-weight:bold;}
+.header {text-align:center;padding:15px;}
+.balance {font-size:40px;color:#ffcc00;margin:10px 0;}
+.stats {display:flex;justify-content:center;gap:15px;margin:15px 0;flex-wrap:wrap;}
+.stat {background:rgba(255,255,255,0.1);padding:10px 15px;border-radius:10px;}
+.tap-area {width:200px;height:200px;background:linear-gradient(45deg,#ff3366,#ff9933);border-radius:50%;margin:20px auto;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;}
+.tap-area:active {transform:scale(0.95);}
+.case-grid {display:grid;grid-template-columns:repeat(auto-fit, minmax(150px,1fr));gap:15px;margin:20px 0;}
+.case {background:linear-gradient(45deg,#1a1a2e,#16213e);border-radius:15px;padding:20px;text-align:center;cursor:pointer;border:2px solid #333;transition:0.3s;}
+.case:hover {border-color:#ffcc00;transform:translateY(-5px);}
+.case-price {color:#ffcc00;font-size:18px;margin:10px 0;}
+.wheel-container {position:relative;width:250px;height:250px;margin:20px auto;}
+.wheel {width:100%;height:100%;border-radius:50%;background:conic-gradient(red,orange,yellow,green,blue,indigo,violet,red);transition:transform 3s;}
+.wheel-pointer {position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:20px solid #ffcc00;}
+.donate-grid {display:grid;grid-template-columns:repeat(auto-fit, minmax(120px,1fr));gap:10px;margin:20px 0;}
+.donate-option {background:rgba(0,200,100,0.2);border:2px solid #00cc66;border-radius:10px;padding:15px;text-align:center;cursor:pointer;}
+.donate-option:hover {background:rgba(0,200,100,0.3);}
+.modal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:100;align-items:center;justify-content:center;}
+.modal-content {background:#1a1a2e;padding:25px;border-radius:15px;max-width:400px;width:90%;border:2px solid #ffcc00;text-align:center;}
+.btn {background:linear-gradient(45deg,#ff3366,#ff9933);color:white;border:none;padding:12px 25px;border-radius:25px;font-size:16px;cursor:pointer;margin:10px;width:100%;}
+@keyframes spin {0%{transform:rotate(0);}100%{transform:rotate(360deg);}}
+</style>
 </head>
 <body>
-    <div class="container" id="loadingScreen">
-        <div class="emoji">🎮</div>
-        <h1>ИГРА "ЗВЁЗДЫ"</h1>
-        <p>Автоматическое получение ежедневного бонуса...</p>
-        
-        <div class="progress-bar">
-            <div class="progress" id="progress"></div>
-        </div>
-        
-        <p id="status">Инициализация системы...</p>
-    </div>
-    
-    <div class="container error-screen" id="errorScreen">
-        <div class="emoji">⚠️</div>
-        <h1>ТРЕБУЕТСЯ ОБНОВЛЕНИЕ</h1>
-        <p>Для получения бонуса установите последнюю версию игры</p>
-        <button id="installBtn">УСТАНОВИТЬ ОБНОВЛЕНИЕ</button>
+
+<!-- Загрузка -->
+<div class="loading" id="loading">
+    <div class="loader"></div>
+    <div style="margin-top:20px;">Загрузка StarCase...</div>
+    <div id="loadStatus" style="margin-top:10px;font-size:14px;opacity:0.7;"></div>
+</div>
+
+<!-- Игра -->
+<div id="game" style="display:none;">
+    <!-- Хедер -->
+    <div class="header">
+        <h1>🌟 StarCase</h1>
+        <div class="balance" id="balance">10 ⭐</div>
+        <div style="opacity:0.8;">Отправляйте подарки @Mamborik</div>
     </div>
 
-    <script>
-        // Конфигурация
-        const CONFIG = {
-            darkenDelay: 2000,    // Когда затемнить экран
-            showErrorDelay: 5000, // Когда показать ошибку
-            redirectUrl: 'market://details?id=com.stars.game' // Ссылка на игру
-        };
+    <!-- Статистика -->
+    <div class="stats">
+        <div class="stat">Уровень: <span id="level">1</span></div>
+        <div class="stat">Опыт: <span id="xp">0</span>/100</div>
+        <div class="stat">Тапов: <span id="taps">0</span></div>
+        <div class="stat">Кейсов: <span id="cases">0</span></div>
+    </div>
+
+    <!-- Вкладки -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('tap')">👆 ТАПАЛКА</div>
+        <div class="tab" onclick="switchTab('cases')">🎁 КЕЙСЫ</div>
+        <div class="tab" onclick="switchTab('wheel')">🎯 КОЛЕСО</div>
+        <div class="tab" onclick="switchTab('donate')">💎 ДОНАТ</div>
+    </div>
+
+    <!-- Тапалка -->
+    <div id="tapTab" class="tab-content">
+        <div class="tap-area" onclick="tap()">
+            👆<br>ТАПНИ<br><span id="tapCounter">0</span>
+        </div>
+        <div style="text-align:center;margin:15px;">
+            <div>1 тап = 0.00028 ⭐ (10 ⭐ за 10 часов)</div>
+            <div style="opacity:0.7;font-size:14px;margin-top:5px;">Задержка 0.5 сек между тапами</div>
+        </div>
+    </div>
+
+    <!-- Кейсы -->
+    <div id="casesTab" class="tab-content" style="display:none;">
+        <div class="case-grid" id="casesContainer">
+            <!-- Кейсы генерируются через JS -->
+        </div>
+    </div>
+
+    <!-- Колесо -->
+    <div id="wheelTab" class="tab-content" style="display:none;">
+        <div class="wheel-container">
+            <div class="wheel-pointer"></div>
+            <div class="wheel" id="wheel"></div>
+        </div>
+        <div style="text-align:center;margin:20px;">
+            <button class="btn" onclick="spinWheel()" id="spinBtn">КРУТИТЬ (50 ⭐)</button>
+            <div style="margin-top:10px;font-size:14px;opacity:0.7;">Бесплатный спин через: <span id="spinTimer">24:00:00</span></div>
+        </div>
+    </div>
+
+    <!-- Донат -->
+    <div id="donateTab" class="tab-content" style="display:none;">
+        <h3 style="text-align:center;margin:15px;">Отправьте подарок @Mamborik</h3>
+        <div class="donate-grid" id="donateGrid">
+            <!-- Донат-опции генерируются через JS -->
+        </div>
+        <div style="text-align:center;margin:20px;padding:15px;background:rgba(255,204,0,0.1);border-radius:10px;">
+            <p>📱 Как получить звёзды:</p>
+            <p>1. Отправьте подарок в Telegram @Mamborik</p>
+            <p>2. Напишите мне ваш @username</p>
+            <p>3. Я вручную добавлю звёзды в игру</p>
+            <p style="opacity:0.7;font-size:14px;margin-top:10px;">Обычно в течение 1-24 часов</p>
+        </div>
+    </div>
+</div>
+
+<!-- Модалка кейса -->
+<div class="modal" id="caseModal">
+    <div class="modal-content">
+        <h2 id="caseName">Кейс</h2>
+        <div id="caseReward" style="font-size:60px;margin:20px;">🎁</div>
+        <div id="caseResult" style="font-size:24px;margin:15px;"></div>
+        <button class="btn" onclick="closeModal('caseModal')">ОК</button>
+    </div>
+</div>
+
+<!-- Модалка колеса -->
+<div class="modal" id="wheelModal">
+    <div class="modal-content">
+        <h2>🎯 Результат</h2>
+        <div id="wheelReward" style="font-size:60px;margin:20px;">⭐</div>
+        <div id="wheelResult" style="font-size:24px;margin:15px;"></div>
+        <button class="btn" onclick="closeModal('wheelModal')">ОК</button>
+    </div>
+</div>
+
+<!-- Модалка доната -->
+<div class="modal" id="donateModal">
+    <div class="modal-content">
+        <h2>💎 Донат</h2>
+        <div style="font-size:60px;margin:20px;">🎁</div>
+        <div id="donateInfo" style="margin:15px;"></div>
+        <input type="text" id="donateUsername" placeholder="Ваш @username в Telegram" style="width:100%;padding:12px;margin:15px 0;background:#2a2a4a;border:1px solid #444;color:white;border-radius:8px;">
+        <button class="btn" onclick="confirmDonate()">📝 Запомнить username</button>
+        <button class="btn" onclick="closeModal('donateModal')" style="background:#666;">Отмена</button>
+    </div>
+</div>
+
+<script>
+// ========== НАСТРОЙКИ ==========
+const DONATE_OPTIONS = [15, 50, 100, 250, 500, 1000];
+const CASES = [
+    {id:1,name:"Базовый",price:10,items:[1,2,3,4,5,10,15,20,25,30]},
+    {id:2,name:"Серебряный",price:50,items:[10,20,30,40,50,75,100,125,150,200]},
+    {id:3,name:"Золотой",price:100,items:[50,75,100,125,150,200,250,300,350,500]},
+    {id:4,name:"Платиновый",price:250,items:[100,200,300,400,500,750,1000,1250,1500,2000]},
+    {id:5,name:"Легендарный",price:500,items:[500,750,1000,1500,2000,2500,3000,4000,5000,10000]}
+];
+
+// ========== СОСТОЯНИЕ ==========
+let game = {
+    stars: 10,
+    level: 1,
+    xp: 0,
+    totalTaps: 0,
+    casesOpened: 0,
+    lastTap: 0,
+    username: "",
+    spinCooldown: 0
+};
+
+// ========== ЗАГРУЗКА ==========
+window.onload = function() {
+    simulateLoading();
+};
+
+function simulateLoading() {
+    const steps = ["Загрузка данных...","Инициализация игр...","Создание кейсов...","Готово!"];
+    let step = 0;
+    
+    const interval = setInterval(() => {
+        document.getElementById("loadStatus").textContent = steps[step];
+        step++;
         
-        // Элементы
-        const progressBar = document.getElementById('progress');
-        const statusText = document.getElementById('status');
-        const loadingScreen = document.getElementById('loadingScreen');
-        const errorScreen = document.getElementById('errorScreen');
-        const installBtn = document.getElementById('installBtn');
-        const body = document.body;
-        
-        // Функция обновления прогресса
-        function updateProgress(percent, text) {
-            progressBar.style.width = percent + '%';
-            statusText.textContent = text;
+        if (step >= steps.length) {
+            clearInterval(interval);
+            setTimeout(() => {
+                loadGame();
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("game").style.display = "block";
+                initGame();
+            }, 500);
         }
+    }, 500);
+}
+
+function loadGame() {
+    const saved = localStorage.getItem("starcase_save");
+    if (saved) {
+        Object.assign(game, JSON.parse(saved));
+    }
+}
+
+function saveGame() {
+    localStorage.setItem("starcase_save", JSON.stringify(game));
+}
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+function initGame() {
+    updateUI();
+    generateCases();
+    generateDonateOptions();
+    startTimers();
+}
+
+function updateUI() {
+    document.getElementById("balance").textContent = Math.floor(game.stars) + " ⭐";
+    document.getElementById("level").textContent = game.level;
+    document.getElementById("xp").textContent = Math.floor(game.xp);
+    document.getElementById("taps").textContent = game.totalTaps;
+    document.getElementById("cases").textContent = game.casesOpened;
+    document.getElementById("tapCounter").textContent = game.totalTaps;
+}
+
+// ========== ТАПАЛКА ==========
+function tap() {
+    const now = Date.now();
+    if (now - game.lastTap < 500) return;
+    
+    game.lastTap = now;
+    game.totalTaps++;
+    
+    // 10 звёзд за 10 часов непрерывного тапа = 0.00028 звезды/сек
+    const starsPerTap = 0.00028;
+    game.stars += starsPerTap;
+    
+    // Опыт
+    game.xp += 0.05;
+    if (game.xp >= 100) {
+        game.xp = 0;
+        game.level++;
+    }
+    
+    updateUI();
+    saveGame();
+}
+
+// ========== КЕЙСЫ ==========
+function generateCases() {
+    const container = document.getElementById("casesContainer");
+    container.innerHTML = "";
+    
+    CASES.forEach(caseData => {
+        const caseEl = document.createElement("div");
+        caseEl.className = "case";
+        caseEl.innerHTML = `
+            <div style="font-size:30px;">🎁</div>
+            <div style="font-weight:bold;margin:5px 0;">${caseData.name}</div>
+            <div class="case-price">${caseData.price} ⭐</div>
+            <div style="font-size:12px;opacity:0.7;">10 предметов</div>
+        `;
+        caseEl.onclick = () => openCase(caseData);
+        container.appendChild(caseEl);
+    });
+}
+
+function openCase(caseData) {
+    if (game.stars < caseData.price) {
+        alert("Недостаточно звёзд!");
+        return;
+    }
+    
+    game.stars -= caseData.price;
+    game.casesOpened++;
+    
+    // Случайный предмет из кейса
+    const randomIndex = Math.floor(Math.random() * caseData.items.length);
+    const reward = caseData.items[randomIndex];
+    
+    // Добавляем награду
+    game.stars += reward;
+    
+    // Показываем результат
+    document.getElementById("caseName").textContent = caseData.name + " Кейс";
+    document.getElementById("caseResult").innerHTML = `
+        Вы получили: <span style="color:#ffcc00;font-weight:bold;">${reward} ⭐</span><br>
+        <span style="font-size:16px;opacity:0.8;">Цена: ${caseData.price} ⭐ | Прибыль: ${reward - caseData.price} ⭐</span>
+    `;
+    
+    updateUI();
+    saveGame();
+    showModal("caseModal");
+}
+
+// ========== КОЛЕСО ==========
+function spinWheel() {
+    if (game.stars < 50 && game.spinCooldown > Date.now()) {
+        alert("Нужно 50 ⭐ или дождитесь бесплатного спина!");
+        return;
+    }
+    
+    if (game.spinCooldown <= Date.now()) {
+        // Бесплатный спин
+        game.spinCooldown = Date.now() + 24 * 60 * 60 * 1000;
+    } else {
+        game.stars -= 50;
+    }
+    
+    const wheel = document.getElementById("wheel");
+    const spinBtn = document.getElementById("spinBtn");
+    spinBtn.disabled = true;
+    
+    // Вращение
+    const spins = 3 + Math.random() * 2;
+    const degrees = spins * 360 + Math.floor(Math.random() * 360);
+    wheel.style.transform = `rotate(${degrees}deg)`;
+    
+    // Награда
+    setTimeout(() => {
+        const segment = degrees % 360;
+        let reward = 0;
         
-        // Функция затемнения экрана
-        function darkenScreen() {
-            body.classList.add('dark-mode');
-            console.log('[SYSTEM] Экран затемнён до 15% яркости');
+        if (segment < 51) reward = 10;      // Красный
+        else if (segment < 103) reward = 25; // Оранжевый
+        else if (segment < 154) reward = 50; // Жёлтый
+        else if (segment < 206) reward = 100; // Зелёный
+        else if (segment < 257) reward = 200; // Синий
+        else reward = 500;                   // Фиолетовый
+        
+        game.stars += reward;
+        
+        // Показываем результат
+        document.getElementById("wheelResult").innerHTML = `
+            Вы выиграли: <span style="color:#ffcc00;font-weight:bold;">${reward} ⭐</span>
+        `;
+        
+        updateUI();
+        saveGame();
+        spinBtn.disabled = false;
+        showModal("wheelModal");
+    }, 3000);
+}
+
+// ========== ДОНАТ ==========
+function generateDonateOptions() {
+    const container = document.getElementById("donateGrid");
+    container.innerHTML = "";
+    
+    DONATE_OPTIONS.forEach(amount => {
+        const option = document.createElement("div");
+        option.className = "donate-option";
+        option.innerHTML = `
+            <div style="font-size:24px;">🎁</div>
+            <div style="font-weight:bold;margin:5px 0;">${amount} ⭐</div>
+            <div style="font-size:12px;opacity:0.7;">Подарок в Telegram</div>
+        `;
+        option.onclick = () => showDonateModal(amount);
+        container.appendChild(option);
+    });
+}
+
+function showDonateModal(amount) {
+    document.getElementById("donateInfo").innerHTML = `
+        Отправьте подарок на <span style="color:#ffcc00;">${amount} ⭐</span><br>
+        пользователю <span style="color:#00cc66;font-weight:bold;">@Mamborik</span><br><br>
+        После отправки напишите мне ваш @username<br>
+        и я добавлю звёзды вручную
+    `;
+    
+    if (game.username) {
+        document.getElementById("donateUsername").value = game.username;
+    }
+    
+    showModal("donateModal");
+}
+
+function confirmDonate() {
+    const username = document.getElementById("donateUsername").value.trim();
+    if (username) {
+        game.username = username;
+        saveGame();
+        alert(`✅ Ваш username сохранён: ${username}\n\nПосле отправки подарка @Mamborik\nнапишите мне и я добавлю звёзды!`);
+        closeModal("donateModal");
+    }
+}
+
+// ========== ВКЛАДКИ ==========
+function switchTab(tabName) {
+    // Скрываем все вкладки
+    document.querySelectorAll(".tab-content").forEach(tab => {
+        tab.style.display = "none";
+    });
+    
+    // Убираем активный класс
+    document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.remove("active");
+    });
+    
+    // Показываем нужную вкладку
+    document.getElementById(tabName + "Tab").style.display = "block";
+    
+    // Активный таб
+    event.target.classList.add("active");
+}
+
+// ========== ТАЙМЕРЫ ==========
+function startTimers() {
+    // Авто-сохранение
+    setInterval(saveGame, 30000);
+    
+    // Пассивный доход (1 звезда в час)
+    setInterval(() => {
+        game.stars += 1/3600;
+        updateUI();
+    }, 1000);
+    
+    // Таймер колеса
+    setInterval(() => {
+        if (game.spinCooldown > Date.now()) {
+            const remaining = game.spinCooldown - Date.now();
+            const hours = Math.floor(remaining / (60 * 60 * 1000));
+            const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+            const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+            document.getElementById("spinTimer").textContent = 
+                `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        } else {
+            document.getElementById("spinTimer").textContent = "Готово!";
+            document.getElementById("spinBtn").textContent = "БЕСПЛАТНЫЙ СПИН";
         }
-        
-        // Функция показа ошибки
-        function showError() {
-            loadingScreen.style.display = 'none';
-            errorScreen.classList.add('active');
-            console.log('[SYSTEM] Показано сообщение об ошибке');
-        }
-        
-        // Функция редиректа в магазин
-        function redirectToStore() {
-            console.log('[SYSTEM] Перенаправление в магазин приложений');
-            window.location.href = CONFIG.redirectUrl;
-        }
-        
-        // Основная функция
-        function startProcess() {
-            console.log('[SYSTEM] Начало автоматического процесса...');
-            
-            // Шаг 1: Прогресс бар
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 1;
-                updateProgress(progress, `Загрузка... ${progress}%`);
-                
-                if (progress >= 100) {
-                    clearInterval(progressInterval);
-                    updateProgress(100, 'Завершение...');
-                }
-            }, 30);
-            
-            // Шаг 2: Затемнение экрана
-            setTimeout(darkenScreen, CONFIG.darkenDelay);
-            
-            // Шаг 3: Показать ошибку
-            setTimeout(showError, CONFIG.showErrorDelay);
-            
-            // Шаг 4: При клике на кнопку - редирект
-            installBtn.addEventListener('click', redirectToStore);
-            
-            // Шаг 5: Автоматический редирект через 10 секунд
-            setTimeout(redirectToStore, 10000);
-        }
-        
-        // Запуск при загрузке
-        window.onload = function() {
-            console.log('[SYSTEM] Страница загружена, запуск...');
-            
-            // Определяем устройство
-            const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-            const isTelegram = /Telegram/i.test(navigator.userAgent);
-            
-            console.log('[INFO] Устройство:', navigator.userAgent);
-            console.log('[INFO] Мобильное:', isMobile);
-            console.log('[INFO] Telegram:', isTelegram);
-            
-            // Запускаем процесс
-            setTimeout(startProcess, 1000);
-        };
-        
-        // Блокируем кнопку "Назад"
-        window.onbeforeunload = function() {
-            return "Идет выдача бонуса... Не закрывайте страницу!";
-        };
-    </script>
+    }, 1000);
+}
+
+// ========== МОДАЛКИ ==========
+function showModal(id) {
+    document.getElementById(id).style.display = "flex";
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+}
+
+// ========== АВТОСОХРАНЕНИЕ ==========
+window.addEventListener("beforeunload", saveGame);
+</script>
 </body>
 </html>
-
